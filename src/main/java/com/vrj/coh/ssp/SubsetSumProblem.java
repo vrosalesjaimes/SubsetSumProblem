@@ -1,58 +1,34 @@
 package com.vrj.coh.ssp;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import java.util.Arrays;
-
 
 
 public class SubsetSumProblem {
 
-    public static ArrayList<Double> readNumbersFromFile(String fileName) {
-        ArrayList<Double> numbers = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line = reader.readLine();
-            if (line != null) {
-                String[] tokens = line.split(",");
-                for (int i = 0; i < tokens.length; i++) {
-                    try {
-                        double number = Double.parseDouble(tokens[i]);
-                        numbers.add(number);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Error al convertir el número: " + tokens[i]);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error al leer el archivo: " + e.getMessage());
-        }
-        return numbers;
-    }
+    private static Integer SEED;
+    private static Integer[] set;
+    private static Integer target;
 
-    public static ArrayList<Double> generateInitialSolution(ArrayList<Double> numbers, long seed) {
+    
+    public static ArrayList<Integer> generateInitialSolution(ArrayList<Integer> numbers, long seed) {
         Random random = new Random(seed);
-        ArrayList<Double> initialSolution = new ArrayList<>();
+        ArrayList<Integer> initialSolution = new ArrayList<>();
 
-        for (Double number : numbers) {
+        for (int i = 0; i < numbers.size(); i++) {
             if (random.nextBoolean()) {
-                initialSolution.add(number);
+                initialSolution.add(1);
+            } else {
+                initialSolution.add(0);
             }
         }
 
         return initialSolution;
     }
 
-    public static double costFunction(ArrayList<Double> subset, double target) {
-        double subsetSum = 0;
-        for (Double num : subset) {
-            subsetSum += num;
-        }
-        
-        return Math.abs(subsetSum - target);
+    private static void setAndTargetExtract(ArrayList<Integer> input){
+       target = input.remove(input.size() - 1);
+       set =  input.toArray(new Integer[input.size()]);
     }
 
     public static void main(String[] args) {
@@ -62,11 +38,14 @@ public class SubsetSumProblem {
         }
 
         String fileName = args[0];
-        long seed = Long.parseLong(args[1]);
+        SEED = Integer.valueOf(args[1]);
 
-        ArrayList<Double> numbers = readNumbersFromFile(fileName);
-        ArrayList<Double> initialSolution = generateInitialSolution(numbers, seed);
-        
+        Lector lector = new Lector(fileName);
+
+        ArrayList<Integer> numbers = lector.readNumbersFromFile();
+        setAndTargetExtract(numbers);
+    
+
     }
 
 }
