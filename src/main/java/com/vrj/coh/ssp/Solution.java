@@ -1,5 +1,8 @@
 package com.vrj.coh.ssp;
 
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
@@ -7,20 +10,23 @@ public class Solution {
 
     
     private Integer[] integersArray;
-    private byte[] bitsMap;
+    private byte[] byteMap;
     private int target;
     private int sum;
     private int cost;
     private static int index;
     private static Random random;
-    private Set<byte[]> tabuListReciently;
-    private Set<TuplaListaTabu> tabuListNoAcceptiing;
+    private Queue<byte[]> tabuListReciently = new LinkedList<>();
+    private Set<TuplaListaTabu> tabuListNoAcceptiing = new HashSet<>();
+    private int sizeTabuList;
 
-    public Solution(Integer[] initialSolution, Long seed){
-        this.integersArray = initialSolution;
+    public Solution(byte[] byteMap, Integer[] integersArray, Integer seed, int target, int sizeTabuList){
+        this.byteMap = byteMap;
+        this.integersArray = integersArray;
+        this.target = target;
+        this.sizeTabuList = sizeTabuList;
         random = new Random(seed);
-        this.sum = 0;
-        this.cost = 0;
+        this.cost = this.costFunction();
     }
 
     public Integer[] getIntegersArray() {
@@ -31,12 +37,12 @@ public class Solution {
         this.integersArray = integersArray;
     }
 
-    public byte[] getBitsMap() {
-        return bitsMap;
+    public byte[] getbyteMap() {
+        return byteMap;
     }
 
-    public void setBitsMap(byte[] bitsMap) {
-        this.bitsMap = bitsMap;
+    public void setbyteMap(byte[] byteMap) {
+        this.byteMap = byteMap;
     }
 
     public int getTarget() {
@@ -63,11 +69,11 @@ public class Solution {
         this.cost = cost;
     }
 
-    public Set<byte[]> getTabuListReciently() {
+    public Queue<byte[]> getTabuListReciently() {
         return tabuListReciently;
     }
 
-    public void setTabuListReciently(Set<byte[]> tabuListReciently) {
+    public void setTabuListReciently(Queue<byte[]> tabuListReciently) {
         this.tabuListReciently = tabuListReciently;
     }
 
@@ -95,37 +101,54 @@ public class Solution {
     public void modifiCost(){
         this.sum += integersArray[index];
         this.cost = Math.abs(this.sum - target);
+        this.sum();
+    }
+
+    private void checkSize(){
+        if (this.tabuListReciently.size() > this.sizeTabuList) {
+            tabuListReciently.remove();
+        }
     }
 
     public boolean neighbor() {
         index = random.nextInt(integersArray.length);
-        TuplaListaTabu tuple = new TuplaListaTabu(this.bitsMap, index);
+        TuplaListaTabu tuple = new TuplaListaTabu(this.byteMap, index);
     
-        if (this.tabuListNoAcceptiing.contains(tuple) || this.tabuListReciently.contains(this.bitsMap)) {
-            return false;
+        if (this.tabuListNoAcceptiing.contains(tuple) || this.tabuListReciently.contains(this.byteMap)) {
+           return false;
         }
     
         boolean foundNeighbor = false;
     
-        if (tryChangeBit(index, integersArray[index] > 0 && this.bitsMap[index] == 0, foundNeighbor)) {
+        if (tryChangeBit(index, integersArray[index] > 0 && this.byteMap[index] == 0, foundNeighbor)) {
             return true;
         }
     
-        if (tryChangeBit(index, integersArray[index] < 0 && this.bitsMap[index] == 1, foundNeighbor)) {
+        if (tryChangeBit(index, integersArray[index] < 0 && this.byteMap[index] == 1, foundNeighbor)) {
             return true;
         }
     
-        tabuListNoAcceptiing.add(tuple);
+        tabuListNoAcceptiing.add(tuple.clone());
     
         return foundNeighbor;
+    }
+
+    public void unSwap(){
+        if (this.byteMap[index] == 0) {
+            this.byteMap[index] = 1;
+        } else {
+            this.byteMap[index] = 0;
+        }
+        this.modifiCost();
     }
     
     private boolean tryChangeBit(int index, boolean condition, boolean foundNeighbor) {
         if (condition) {
-            this.bitsMap[index] = (byte) ((this.bitsMap[index] == 0) ? 1 : 0);
-            tabuListReciently.add(this.bitsMap);
-            modifiCost();
+            this.byteMap[index] = (byte) ((this.byteMap[index] == 0) ? 1 : 0);
+            tabuListReciently.add(this.byteMap.clone());
+            this.modifiCost();
             foundNeighbor = true;
+            this.checkSize();
         }
         return foundNeighbor;
     }

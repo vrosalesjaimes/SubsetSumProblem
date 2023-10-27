@@ -13,7 +13,11 @@ public class TuplaListaTabu {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(mapaDeBits) ^ Integer.hashCode(valorEntero);
+        int hash = 1;
+        for (byte b : mapaDeBits) {
+            hash = 31 * hash + b; 
+        }
+        return hash ^ Integer.hashCode(valorEntero);
     }
 
     @Override
@@ -27,4 +31,10 @@ public class TuplaListaTabu {
         TuplaListaTabu other = (TuplaListaTabu) obj;
         return Arrays.equals(mapaDeBits, other.mapaDeBits) && valorEntero == other.valorEntero;
     }
+
+    public TuplaListaTabu clone() {
+        return new TuplaListaTabu(mapaDeBits.clone(), valorEntero);
+    }
 }
+
+

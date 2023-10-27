@@ -9,17 +9,20 @@ public class SubsetSumProblem {
     private static Integer SEED;
     private static Integer[] set;
     private static Integer target;
+    private final static int iteraciones = 100000;
+    private static Solution bestSolution;
+    private static int sizeTabuList = 1000;
 
     
-    public static ArrayList<Integer> generateInitialSolution(ArrayList<Integer> numbers, long seed) {
+    public static byte[] generateInitialSolution(ArrayList<Integer> numbers, long seed) {
         Random random = new Random(seed);
-        ArrayList<Integer> initialSolution = new ArrayList<>();
+        byte[] initialSolution = new byte[numbers.size()];
 
         for (int i = 0; i < numbers.size(); i++) {
             if (random.nextBoolean()) {
-                initialSolution.add(1);
+                initialSolution[i] = 1;
             } else {
-                initialSolution.add(0);
+                initialSolution[i]= 0 ;
             }
         }
 
@@ -29,6 +32,23 @@ public class SubsetSumProblem {
     private static void setAndTargetExtract(ArrayList<Integer> input){
        target = input.remove(input.size() - 1);
        set =  input.toArray(new Integer[input.size()]);
+    }
+
+    private static void tabuSearch(Solution solution){
+        for(int i = 0; i < iteraciones; i++){
+            int cost = solution.getCost();
+            boolean hayVecino = solution.neighbor();
+            if (hayVecino) {
+                if(cost < solution.getCost()){
+                    System.out.println(cost);
+                    if(solution.getCost() < bestSolution.getCost()){
+                        bestSolution = solution;
+                    }
+                }
+            } else{
+                solution.unSwap();
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -44,8 +64,12 @@ public class SubsetSumProblem {
 
         ArrayList<Integer> numbers = lector.readNumbersFromFile();
         setAndTargetExtract(numbers);
-    
+        byte[] initialSolution = generateInitialSolution(numbers, SEED);
 
+        Solution solution = new Solution(initialSolution, set, SEED, target, sizeTabuList);
+        bestSolution = solution;
+        tabuSearch(solution);
+        System.out.println(bestSolution.getCost());
     }
 
 }
