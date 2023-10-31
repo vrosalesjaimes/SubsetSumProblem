@@ -1,10 +1,8 @@
 package com.vrj.coh.ssp;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
-import java.util.Set;
 
 public class Solution {
 
@@ -17,7 +15,6 @@ public class Solution {
     private static int index;
     private static Random random;
     private Queue<byte[]> tabuListReciently = new LinkedList<>();
-    private Set<TuplaListaTabu> tabuListNoAcceptiing = new HashSet<>();
     private int sizeTabuList;
 
     public Solution(byte[] byteMap, Integer[] integersArray, Integer seed, int target, int sizeTabuList){
@@ -26,7 +23,7 @@ public class Solution {
         this.target = target;
         this.sizeTabuList = sizeTabuList;
         random = new Random(seed);
-        this.cost = this.costFunction();
+        this.costFunction();
     }
 
     public Integer[] getIntegersArray() {
@@ -77,31 +74,19 @@ public class Solution {
         this.tabuListReciently = tabuListReciently;
     }
 
-    public Set<TuplaListaTabu> getTabuListNoAcceptiing() {
-        return tabuListNoAcceptiing;
-    }
-
-    public void setTabuListNoAcceptiing(Set<TuplaListaTabu> tabuListNoAcceptiing) {
-        this.tabuListNoAcceptiing = tabuListNoAcceptiing;
-    }
-
     public void sum(){
         int sumOfSet = 0;
         for(int i = 0; i < this.integersArray.length; i++){
-            sum += integersArray[i];
+            if (this.byteMap[i] == 1) {
+                sumOfSet += integersArray[i];
+            }
         }
         this.sum = sumOfSet;
     }
 
-    public int costFunction() {
+    public void costFunction() {
         this.sum();
-        return Math.abs(this.sum - target);
-    }
-
-    public void modifiCost(){
-        this.sum += integersArray[index];
         this.cost = Math.abs(this.sum - target);
-        this.sum();
     }
 
     private void checkSize(){
@@ -110,27 +95,19 @@ public class Solution {
         }
     }
 
-    public boolean neighbor() {
+    public void neighbor(){
         index = random.nextInt(integersArray.length);
-        TuplaListaTabu tuple = new TuplaListaTabu(this.byteMap, index);
-    
-        if (this.tabuListNoAcceptiing.contains(tuple) || this.tabuListReciently.contains(this.byteMap)) {
-           return false;
+        boolean value = random.nextBoolean();
+
+        if(value){
+            this.byteMap[index] = 1;
+        } else {
+            this.byteMap[index] = 0;
         }
-    
-        boolean foundNeighbor = false;
-    
-        if (tryChangeBit(index, integersArray[index] > 0 && this.byteMap[index] == 0, foundNeighbor)) {
-            return true;
-        }
-    
-        if (tryChangeBit(index, integersArray[index] < 0 && this.byteMap[index] == 1, foundNeighbor)) {
-            return true;
-        }
-    
-        tabuListNoAcceptiing.add(tuple.clone());
-    
-        return foundNeighbor;
+
+        this.costFunction();
+        this.tabuListReciently.add(this.byteMap.clone());
+        this.checkSize();
     }
 
     public void unSwap(){
@@ -139,19 +116,22 @@ public class Solution {
         } else {
             this.byteMap[index] = 0;
         }
-        this.modifiCost();
+        this.costFunction();
     }
+
+    public Solution clone(){
+        return new Solution(this.byteMap.clone(), this.integersArray, random.nextInt(), this.target, this.sizeTabuList);
+    }
+
     
-    private boolean tryChangeBit(int index, boolean condition, boolean foundNeighbor) {
-        if (condition) {
-            this.byteMap[index] = (byte) ((this.byteMap[index] == 0) ? 1 : 0);
-            tabuListReciently.add(this.byteMap.clone());
-            this.modifiCost();
-            foundNeighbor = true;
-            this.checkSize();
+
+    public int size(){ 
+        int numUnos = 0;
+        for(byte b : this.byteMap){
+            if(b == 1){
+                numUnos++;
+            }
         }
-        return foundNeighbor;
+        return numUnos;
     }
-    
-    
 }

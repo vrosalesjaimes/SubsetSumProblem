@@ -9,7 +9,7 @@ public class SubsetSumProblem {
     private static Integer SEED;
     private static Integer[] set;
     private static Integer target;
-    private final static int iteraciones = 100000;
+    private final static int iteraciones = 1000000;
     private static Solution bestSolution;
     private static int sizeTabuList = 1000;
 
@@ -35,15 +35,16 @@ public class SubsetSumProblem {
     }
 
     private static void tabuSearch(Solution solution){
+        int cost = solution.getCost();
+        bestSolution = solution.clone();
+        //System.out.println("Target: " + target);
         for(int i = 0; i < iteraciones; i++){
-            int cost = solution.getCost();
-            boolean hayVecino = solution.neighbor();
-            if (hayVecino) {
-                if(cost < solution.getCost()){
-                    System.out.println(cost);
-                    if(solution.getCost() < bestSolution.getCost()){
-                        bestSolution = solution;
-                    }
+            solution.neighbor();            
+            if(solution.getCost() < cost){
+                cost = solution.getCost();
+                if(cost < bestSolution.getCost()){
+                    bestSolution = solution.clone();
+                    //System.out.println("iteracion: " + i + " costo: " + bestSolution.getCost() + " suma: " + bestSolution.getSum());
                 }
             } else{
                 solution.unSwap();
@@ -67,9 +68,8 @@ public class SubsetSumProblem {
         byte[] initialSolution = generateInitialSolution(numbers, SEED);
 
         Solution solution = new Solution(initialSolution, set, SEED, target, sizeTabuList);
-        bestSolution = solution;
         tabuSearch(solution);
-        System.out.println(bestSolution.getCost());
+        System.out.println(SEED + "," + bestSolution.getCost()+ "," + bestSolution.getSum() + ", size: " + bestSolution.size());
     }
 
 }
