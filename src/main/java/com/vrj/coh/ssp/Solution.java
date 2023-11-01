@@ -1,29 +1,28 @@
 package com.vrj.coh.ssp;
 
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Random;
 
 public class Solution {
 
-    
     private Integer[] integersArray;
     private byte[] byteMap;
     private int target;
     private int sum;
     private int cost;
     private static int index;
+    private static double probability;
     private static Random random;
-    private Queue<byte[]> tabuListReciently = new LinkedList<>();
-    private int sizeTabuList;
+    private TabuList tabuListReciently;
+    private TabuList prohibedList;
 
     public Solution(byte[] byteMap, Integer[] integersArray, Integer seed, int target, int sizeTabuList){
         this.byteMap = byteMap;
         this.integersArray = integersArray;
         this.target = target;
-        this.sizeTabuList = sizeTabuList;
         random = new Random(seed);
         this.costFunction();
+        this.tabuListReciently = new TabuList(sizeTabuList);
+        this.prohibedList = new TabuList(sizeTabuList);
     }
 
     public Integer[] getIntegersArray() {
@@ -34,11 +33,11 @@ public class Solution {
         this.integersArray = integersArray;
     }
 
-    public byte[] getbyteMap() {
+    public byte[] getByteMap() {
         return byteMap;
     }
 
-    public void setbyteMap(byte[] byteMap) {
+    public void setByteMap(byte[] byteMap) {
         this.byteMap = byteMap;
     }
 
@@ -66,12 +65,36 @@ public class Solution {
         this.cost = cost;
     }
 
-    public Queue<byte[]> getTabuListReciently() {
+    public static int getIndex() {
+        return index;
+    }
+
+    public static void setIndex(int index) {
+        Solution.index = index;
+    }
+
+    public static Random getRandom() {
+        return random;
+    }
+
+    public static void setRandom(Random random) {
+        Solution.random = random;
+    }
+
+    public TabuList getTabuListReciently() {
         return tabuListReciently;
     }
 
-    public void setTabuListReciently(Queue<byte[]> tabuListReciently) {
+    public void setTabuListReciently(TabuList tabuListReciently) {
         this.tabuListReciently = tabuListReciently;
+    }
+
+    public TabuList getProhibedList() {
+        return prohibedList;
+    }
+
+    public void setProhibedList(TabuList prohibedList) {
+        this.prohibedList = prohibedList;
     }
 
     public void sum(){
@@ -89,28 +112,54 @@ public class Solution {
         this.cost = Math.abs(this.sum - target);
     }
 
-    private void checkSize(){
-        if (this.tabuListReciently.size() > this.sizeTabuList) {
-            tabuListReciently.remove();
-        }
-    }
-
     public void neighbor(){
         index = random.nextInt(integersArray.length);
-        boolean value = random.nextBoolean();
+        boolean probability = random.nextBoolean();
 
-        if(value){
+        if(probability){
             this.byteMap[index] = 1;
         } else {
             this.byteMap[index] = 0;
         }
 
         this.costFunction();
-        this.tabuListReciently.add(this.byteMap.clone());
-        this.checkSize();
     }
 
-    public void unSwap(){
+    public boolean neighborRestrict(){
+        index = random.nextInt(integersArray.length);
+
+        if (sum < target) {
+            if (this.byteMap[index] == 0 && this.integersArray[index] > 0){
+                this.byteMap[index] = 1;
+                this.costFunction();
+                return true;
+            }
+
+            if (this.byteMap[index] == 1 && this.integersArray[index] < 0){
+                this.byteMap[index] = 0;
+                this.costFunction();
+                return true; 
+            }
+        }
+
+        if (target < sum) {
+            if (this.byteMap[index] == 0 && this.integersArray[index] < 0){
+                this.byteMap[index] = 1;
+                this.costFunction();
+                return true;
+            }
+
+            if (this.byteMap[index] == 1 && this.integersArray[index] > 0){
+                this.byteMap[index] = 0;
+                this.costFunction();
+                return true; 
+            }            
+        }
+
+        return false;
+    }
+
+    public void unFlip(){
         if (this.byteMap[index] == 0) {
             this.byteMap[index] = 1;
         } else {
@@ -119,13 +168,7 @@ public class Solution {
         this.costFunction();
     }
 
-    public Solution clone(){
-        return new Solution(this.byteMap.clone(), this.integersArray, random.nextInt(), this.target, this.sizeTabuList);
-    }
-
-    
-
-    public int size(){ 
+    public int sizeOfByteMap(){ 
         int numUnos = 0;
         for(byte b : this.byteMap){
             if(b == 1){
@@ -133,5 +176,9 @@ public class Solution {
             }
         }
         return numUnos;
+    }
+
+    public Solution clone(){
+        return new Solution(this.byteMap.clone(), integersArray, 0, this.target, this.cost);
     }
 }

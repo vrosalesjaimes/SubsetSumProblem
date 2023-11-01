@@ -57,7 +57,7 @@ public class TabuListTuple {
      */
     @Override
     public int hashCode() {
-        String s = Arrays.toString(bitMap) + index;
+        String s = this.toString();
         return s.hashCode();
     }
 
@@ -76,6 +76,16 @@ public class TabuListTuple {
         }
         TabuListTuple other = (TabuListTuple) obj;
         return Arrays.equals(bitMap, other.bitMap) && index == other.index;
+    }
+
+    /**
+     * Returns a string representation of this tuple, concatenating the bit map and the index.
+     *
+     * @return The string representation.
+     */
+    @Override
+    public String toString() {
+        return Arrays.toString(bitMap) + index;
     }
 }
 

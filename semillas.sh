@@ -15,8 +15,8 @@ OUTPUT_FILE="salida.csv"
 execute_with_timeout() {
     semilla="$1"
     comando="java -jar \"$JAR_FILE\" \"$INPUT_FILE\" \"$semilla\""
-    timeout 3m java -jar "$JAR_FILE" "$INPUT_FILE" "$semilla" 2>&1 | tee -a "$OUTPUT_FILE"
-    echo "------------------------------------"
+    timeout 3m java -jar "$JAR_FILE" "-n" "$INPUT_FILE" "$semilla" 2>&1 | tee -a "$OUTPUT_FILE"
+    echo "-------------------------------------------------------------------------------------"
 }
 
 # Bucle for para ejecutar el comando con diferentes semillas
