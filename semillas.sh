@@ -2,11 +2,11 @@
 
 # Nombre del archivo JAR y la entrada
 JAR_FILE="target/SubsetSumProblem-jar-with-dependencies.jar"
-INPUT_FILE="ej.ssp"
+INPUT_FILE="instancia2.tsp"
 
 # Rango de semillas que deseas probar
 SEMILLA_INICIAL=1
-SEMILLA_FINAL=100000
+SEMILLA_FINAL=50
 
 # Nombre del archivo de salida
 OUTPUT_FILE="salida.csv"

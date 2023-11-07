@@ -10,7 +10,6 @@ public class Solution {
     private int sum;
     private int cost;
     private static int index;
-    private static double probability;
     private static Random random;
     private TabuList tabuListReciently;
     private TabuList prohibedList;
@@ -123,40 +122,6 @@ public class Solution {
         }
 
         this.costFunction();
-    }
-
-    public boolean neighborRestrict(){
-        index = random.nextInt(integersArray.length);
-
-        if (sum < target) {
-            if (this.byteMap[index] == 0 && this.integersArray[index] > 0){
-                this.byteMap[index] = 1;
-                this.costFunction();
-                return true;
-            }
-
-            if (this.byteMap[index] == 1 && this.integersArray[index] < 0){
-                this.byteMap[index] = 0;
-                this.costFunction();
-                return true; 
-            }
-        }
-
-        if (target < sum) {
-            if (this.byteMap[index] == 0 && this.integersArray[index] < 0){
-                this.byteMap[index] = 1;
-                this.costFunction();
-                return true;
-            }
-
-            if (this.byteMap[index] == 1 && this.integersArray[index] > 0){
-                this.byteMap[index] = 0;
-                this.costFunction();
-                return true; 
-            }            
-        }
-
-        return false;
     }
 
     public void unFlip(){

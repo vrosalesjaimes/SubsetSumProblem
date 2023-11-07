@@ -10,9 +10,9 @@ public class SubsetSumProblem {
     private static Integer SEED;
     private static Integer[] set;
     private static Integer target;
-    private final static int iteraciones = 10;
+    private final static int iteraciones = 1000000;
     private static Solution bestSolution;
-    private static int sizeTabuList = 1000000;
+    private static int sizeTabuList = 10000;
     private static double PROBABILITY = 0.04;
 
     
@@ -21,7 +21,7 @@ public class SubsetSumProblem {
         byte[] initialSolution = new byte[numbers.size()];
     
         for (int i = 0; i < numbers.size(); i++) {
-            if (random.nextDouble(1) < probability) {
+            if (random.nextBoolean()) {
                 initialSolution[i] = 1;
             } else {
                 initialSolution[i] = 0;
@@ -57,37 +57,14 @@ public class SubsetSumProblem {
         }
     }
 
-    private static void tabuSearchRestricted(Solution solution){
-        int cost = solution.getCost();
-
-        for(int i = 0; i < iteraciones; i++){
-            boolean hayVecino = solution.neighborRestrict();
-
-            if (hayVecino && !solution.getProhibedList().contains(Arrays.toString(solution.getByteMap()))
-                          && !solution.getTabuListReciently().contains(Arrays.toString(solution.getByteMap()))) {
-                if(solution.getCost() < cost){
-                    cost = solution.getCost();
-                    if(cost < bestSolution.getCost()){
-                        bestSolution = solution.clone();
-                    }
-                }
-                solution.getProhibedList().add(Arrays.toString(solution.getByteMap()));
-            } else{
-                //solution.unFlip();
-                
-            }
-        }
-    }
-
     public static void main(String[] args) {
         if (args.length != 3) {
             System.out.println("Uso incorrecto. Debes proporcionar el nombre del archivo como argumento.");
             return;
         }
 
-        String bandera = args[0];
-        String fileName = args[1];
-        SEED = Integer.valueOf(args[2]);
+        String fileName = args[0];
+        SEED = Integer.valueOf(args[1]);
 
         Lector lector = new Lector(fileName);
 
@@ -96,16 +73,8 @@ public class SubsetSumProblem {
         byte[] initialSolution = generateInitialSolution(numbers, SEED, PROBABILITY);
         Solution solution = new Solution(initialSolution, set, SEED, target, sizeTabuList);
         bestSolution = solution.clone();
-        if (bandera.equals("-n")) {
-            tabuSearch(solution);   
-        }
-
-        else if(bandera.equals("-r")){
-            tabuSearchRestricted(solution);
-        }
-        else{
-            return;
-        }
+            
+        tabuSearch(solution);   
 
         System.out.println(SEED + "," + bestSolution.getCost()+ "," + bestSolution.getSum() + "," + bestSolution.sizeOfByteMap());
     }
