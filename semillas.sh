@@ -2,11 +2,11 @@
 
 # Nombre del archivo JAR y la entrada
 JAR_FILE="target/SubsetSumProblem-jar-with-dependencies.jar"
-INPUT_FILE="instancia2.tsp"
+INPUT_FILE="inputs/instancia1.ssp"
 
 # Rango de semillas que deseas probar
 SEMILLA_INICIAL=1
-SEMILLA_FINAL=50
+SEMILLA_FINAL=100
 
 # Nombre del archivo de salida
 OUTPUT_FILE="salida.csv"
@@ -15,7 +15,7 @@ OUTPUT_FILE="salida.csv"
 execute_with_timeout() {
     semilla="$1"
     comando="java -jar \"$JAR_FILE\" \"$INPUT_FILE\" \"$semilla\""
-    timeout 3m java -jar "$JAR_FILE" "-n" "$INPUT_FILE" "$semilla" 2>&1 | tee -a "$OUTPUT_FILE"
+    timeout 3m java -jar "$JAR_FILE" "$INPUT_FILE" "$semilla" 2>&1 | tee -a "$OUTPUT_FILE"
     echo "-------------------------------------------------------------------------------------"
 }
 

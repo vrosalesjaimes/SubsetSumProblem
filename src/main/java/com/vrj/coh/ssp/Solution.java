@@ -12,7 +12,9 @@ public class Solution {
     private static int index;
     private static Random random;
     private TabuList tabuListReciently;
-    private TabuList prohibedList;
+    private static int lastOperation = 0; 
+    private static int firstIndex = -1;
+    private static int secondIndex = -1;
 
     public Solution(byte[] byteMap, Integer[] integersArray, Integer seed, int target, int sizeTabuList){
         this.byteMap = byteMap;
@@ -21,7 +23,6 @@ public class Solution {
         random = new Random(seed);
         this.costFunction();
         this.tabuListReciently = new TabuList(sizeTabuList);
-        this.prohibedList = new TabuList(sizeTabuList);
     }
 
     public Integer[] getIntegersArray() {
@@ -88,14 +89,6 @@ public class Solution {
         this.tabuListReciently = tabuListReciently;
     }
 
-    public TabuList getProhibedList() {
-        return prohibedList;
-    }
-
-    public void setProhibedList(TabuList prohibedList) {
-        this.prohibedList = prohibedList;
-    }
-
     public void sum(){
         int sumOfSet = 0;
         for(int i = 0; i < this.integersArray.length; i++){
@@ -112,25 +105,85 @@ public class Solution {
     }
 
     public void neighbor(){
-        index = random.nextInt(integersArray.length);
-        boolean probability = random.nextBoolean();
+        double randomValue = random.nextDouble(1);
 
-        if(probability){
-            this.byteMap[index] = 1;
-        } else {
-            this.byteMap[index] = 0;
+        if (randomValue < 0.9) {
+                if (this.sum < this.target) {
+                    int indexToAdd = random.nextInt(this.integersArray.length);
+                    if (this.byteMap[indexToAdd] == 0) {
+                        this.byteMap[indexToAdd] = 1;
+                        lastOperation = 1;
+                        firstIndex = indexToAdd;
+                        this.costFunction();
+                        return;
+                    }
+                }else {
+                    int indexToRemove = random.nextInt(this.integersArray.length);
+                    if (this.byteMap[indexToRemove] == 1) {
+                        this.byteMap[indexToRemove] = 0;
+                        lastOperation = 2;
+                        firstIndex = indexToRemove;
+                        this.costFunction();
+                        return;
+                    }
+                } 
         }
+        else {
+            int index1 = random.nextInt(this.integersArray.length);
+            int index2 = random.nextInt(this.integersArray.length);
 
-        this.costFunction();
+            if (this.byteMap[index1] == 1 && this.byteMap[index2] == 0
+            || this.byteMap[index1] == 0 && this.byteMap[index2] == 1) {
+                this.byteMap[index1] = 0;
+                this.byteMap[index2] = 1;
+                lastOperation = 3;
+                firstIndex = index1;
+                secondIndex = index2;
+                this.costFunction();
+                return;
+            }
+        } 
     }
 
     public void unFlip(){
-        if (this.byteMap[index] == 0) {
-            this.byteMap[index] = 1;
-        } else {
-            this.byteMap[index] = 0;
+        switch (lastOperation) {
+            case 1:
+                this.byteMap[firstIndex] = 0;
+                break;
+            case 2:
+                this.byteMap[firstIndex] = 1;
+                break;
+            case 3:
+                this.byteMap[firstIndex] = (this.byteMap[firstIndex] == 0) ? (byte) 1 : 0;
+                this.byteMap[secondIndex] = (this.byteMap[secondIndex] == 0) ? (byte) 1 : 0;
+                break;
+            default:
+                break;
         }
-        this.costFunction();
+    }
+
+    public void flip(int index){
+        this.byteMap[index] = (this.byteMap[index] == 0) ? (byte) 1 : 0;
+    }
+
+    public boolean swept(){
+        boolean thereIsLess = false;
+        for(int i = 0; i < byteMap.length; i++){
+            for (int j = i+1; j < byteMap.length; j++){
+                this.flip(i);
+                this.flip(j);
+                double bestCost = this.getCost();
+                if(bestCost < this.getCost()){
+                    this.flip(i);
+                    this.flip(j);
+                } else{
+                    thereIsLess = true;
+                    return thereIsLess;
+                }
+            }
+        }
+
+        return thereIsLess;
     }
 
     public int sizeOfByteMap(){ 
@@ -141,6 +194,18 @@ public class Solution {
             }
         }
         return numUnos;
+    }
+
+    public String toString(){
+        String s = "";
+
+         for(int i=0; i < this.byteMap.length; i++){
+            if(byteMap[i] == 1){
+                s += (this.integersArray[i] + " ,");
+            }
+        }
+
+        return s;
     }
 
     public Solution clone(){

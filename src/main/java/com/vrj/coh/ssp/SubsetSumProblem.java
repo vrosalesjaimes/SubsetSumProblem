@@ -10,9 +10,9 @@ public class SubsetSumProblem {
     private static Integer SEED;
     private static Integer[] set;
     private static Integer target;
-    private final static int iteraciones = 1000000;
+    private final static int iteraciones = 1100000;
     private static Solution bestSolution;
-    private static int sizeTabuList = 10000;
+    private static int sizeTabuList = 1000;
     private static double PROBABILITY = 0.04;
 
     
@@ -21,7 +21,7 @@ public class SubsetSumProblem {
         byte[] initialSolution = new byte[numbers.size()];
     
         for (int i = 0; i < numbers.size(); i++) {
-            if (random.nextBoolean()) {
+            if (random.nextDouble() < probability) {
                 initialSolution[i] = 1;
             } else {
                 initialSolution[i] = 0;
@@ -38,6 +38,7 @@ public class SubsetSumProblem {
 
     private static void tabuSearch(Solution solution){
         int cost = solution.getCost();
+        int length = solution.sizeOfByteMap();
 
         for(int i = 0; i < iteraciones; i++){
             solution.neighbor();  
@@ -48,6 +49,13 @@ public class SubsetSumProblem {
                     cost = solution.getCost();
                     if(cost < bestSolution.getCost()){
                         bestSolution = solution.clone();
+                        System.out.println(cost);
+                    }
+                }
+
+                if (solution.getCost() == cost && solution.sizeOfByteMap() < length) {
+                    if (cost <= bestSolution.getCost()) {
+                        bestSolution = solution.clone();
                     }
                 }
                 solution.getTabuListReciently().add(neighbor);
@@ -55,10 +63,11 @@ public class SubsetSumProblem {
                 solution.unFlip();
             }
         }
+        while (bestSolution.swept());
     }
 
     public static void main(String[] args) {
-        if (args.length != 3) {
+        if (args.length != 2) {
             System.out.println("Uso incorrecto. Debes proporcionar el nombre del archivo como argumento.");
             return;
         }
@@ -76,7 +85,10 @@ public class SubsetSumProblem {
             
         tabuSearch(solution);   
 
-        System.out.println(SEED + "," + bestSolution.getCost()+ "," + bestSolution.getSum() + "," + bestSolution.sizeOfByteMap());
+        //System.out.println(SEED + " Costo: " + bestSolution.getCost()+ " Suma: " + bestSolution.getSum() + " Tamaño: " + bestSolution.sizeOfByteMap());
+        System.out.println("Costo: " + bestSolution.getCost()+ "\n Suma: " 
+                          + bestSolution.getSum() + "\n Tamaño: " + bestSolution.sizeOfByteMap()
+                            + "\n Solución: " + bestSolution.toString());
     }
 
 }
