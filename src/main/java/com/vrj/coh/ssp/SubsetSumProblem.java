@@ -12,7 +12,7 @@ public class SubsetSumProblem {
     private static Integer target;
     private final static int iteraciones = 1100000;
     private static Solution bestSolution;
-    private static int sizeTabuList = 1000;
+    private static int sizeTabuList = 100000;
     private static double PROBABILITY = 0.04;
 
     
@@ -49,11 +49,10 @@ public class SubsetSumProblem {
                     cost = solution.getCost();
                     if(cost < bestSolution.getCost()){
                         bestSolution = solution.clone();
-                        System.out.println(cost);
                     }
                 }
 
-                if (solution.getCost() == cost && solution.sizeOfByteMap() < length) {
+                if (solution.getCost() == 0 && solution.sizeOfByteMap() < length) {
                     if (cost <= bestSolution.getCost()) {
                         bestSolution = solution.clone();
                     }
@@ -63,7 +62,6 @@ public class SubsetSumProblem {
                 solution.unFlip();
             }
         }
-        while (bestSolution.swept());
     }
 
     public static void main(String[] args) {
@@ -85,10 +83,9 @@ public class SubsetSumProblem {
             
         tabuSearch(solution);   
 
-        //System.out.println(SEED + " Costo: " + bestSolution.getCost()+ " Suma: " + bestSolution.getSum() + " Tamaño: " + bestSolution.sizeOfByteMap());
-        System.out.println("Costo: " + bestSolution.getCost()+ "\n Suma: " 
-                          + bestSolution.getSum() + "\n Tamaño: " + bestSolution.sizeOfByteMap()
-                            + "\n Solución: " + bestSolution.toString());
+        System.out.println("Costo: " + bestSolution.getCost()+ "\nSuma: " 
+                          + bestSolution.getSum() + "\nTamaño: " + bestSolution.sizeOfByteMap()
+                            + "\nSolución: " + bestSolution.toString() + "\nTarget: " + target);
     }
 
 }

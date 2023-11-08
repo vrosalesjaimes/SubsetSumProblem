@@ -166,26 +166,6 @@ public class Solution {
         this.byteMap[index] = (this.byteMap[index] == 0) ? (byte) 1 : 0;
     }
 
-    public boolean swept(){
-        boolean thereIsLess = false;
-        for(int i = 0; i < byteMap.length; i++){
-            for (int j = i+1; j < byteMap.length; j++){
-                this.flip(i);
-                this.flip(j);
-                double bestCost = this.getCost();
-                if(bestCost < this.getCost()){
-                    this.flip(i);
-                    this.flip(j);
-                } else{
-                    thereIsLess = true;
-                    return thereIsLess;
-                }
-            }
-        }
-
-        return thereIsLess;
-    }
-
     public int sizeOfByteMap(){ 
         int numUnos = 0;
         for(byte b : this.byteMap){
