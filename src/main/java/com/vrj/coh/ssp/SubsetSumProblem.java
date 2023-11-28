@@ -83,9 +83,9 @@ public class SubsetSumProblem {
             
         tabuSearch(solution);   
 
-        System.out.println("Costo: " + bestSolution.getCost()+ "\nSuma: " 
-                          + bestSolution.getSum() + "\nTamaño: " + bestSolution.sizeOfByteMap()
-                            + "\nSolución: " + bestSolution.toString() + "\nTarget: " + target);
+        System.out.println("Costo: " + bestSolution.getCost()+ " Suma: " 
+                          + bestSolution.getSum() + " Tamaño: " + bestSolution.sizeOfByteMap()
+                        + " Target: " + target);
     }
 
 }
